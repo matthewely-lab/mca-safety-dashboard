@@ -83,6 +83,32 @@ tr:active{background:var(--card)}
 .drill-notes:focus{border-color:var(--accent);outline:none}
 .report-btn{display:block;width:100%;padding:11px;border-radius:9px;border:none;background:var(--accent);color:#0f172a;font-weight:700;font-size:.85rem;cursor:pointer;margin-top:8px}
 .report-btn:hover{filter:brightness(1.1)}
+|/* Pin Map / Incidents */
+|.pin-legend{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 8px}
+|.pin-cat{display:flex;align-items:center;gap:4px;font-size:.62rem;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .2s}
+|.pin-cat.sel{border-color:var(--accent);background:rgba(56,189,248,.12)}
+|.pin-cat .dot{width:8px;height:8px;border-radius:50%}
+|.pin-cat:disabled{opacity:.4;cursor:not-allowed}
+|.pin-hint{font-size:.68rem;color:var(--muted);text-align:center;padding:6px 0}
+|.pin-hint.active{color:var(--accent);font-weight:600}
+|.incident-list{max-height:300px;overflow-y:auto;margin-top:6px}
+|.inc-item{display:flex;align-items:flex-start;gap:8px;padding:8px;border-bottom:1px solid var(--border);font-size:.74rem}
+|.inc-item:last-child{border-bottom:none}
+|.inc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+|.inc-info{flex:1}
+|.inc-room{font-weight:700;font-size:.82rem}
+|.inc-meta{color:var(--muted);font-size:.68rem;margin-top:2px}
+|.inc-notes{color:var(--text);font-size:.72rem;margin-top:3px;font-style:italic}
+|.inc-actions{display:flex;gap:4px;flex-shrink:0}
+|.inc-btn{padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.65rem;font-weight:600}
+|.inc-btn:hover{border-color:var(--accent);color:var(--accent)}
+|.inc-btn.resolve:hover{border-color:#22c55e;color:#22c55e}
+|.inc-btn.del:hover{border-color:#ef4444;color:#ef4444}
+|.pin-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
+|.pin-stat{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:8px;text-align:center}
+|.pin-stat .snum{font-size:1.2rem;font-weight:800}
+|.pin-stat .slbl{font-size:.62rem;color:var(--muted)}
+|.pin-room-label{font-size:.65rem;color:var(--muted);font-style:italic}
 @media print{.tabs,.btn-print,.modal-overlay,.legend,.sbox,.drill-action-row,.drill-type-row,.drill-notes,.report-btn{display:none!important}.view{display:block!important}.psec{break-inside:avoid;border:1px solid #ccc;background:none}header{position:static}}
 </style>
 </head>
@@ -96,6 +122,7 @@ tr:active{background:var(--card)}
   <button onclick="showView('search')">&#128269; Search</button>
   <button onclick="showView('alarms')">&#128293; Devices</button>
   <button onclick="showView('drills')">&#128681; Drills</button>
+  <button onclick="showView('incidents')">&#128205; Incidents</button>
   <button onclick="showView('packet')">&#128196; Packet</button>
 </div>
 
@@ -173,6 +200,37 @@ tr:active{background:var(--card)}
     <h3>&#128203; Drill History</h3>
     <div id="drillLog" class="drill-log"></div>
     <button class="report-btn" onclick="generateReport()">&#128196; Generate Compliance Report</button>
+  </div>
+</div>
+
+<div id="incidents" class="view">
+  <div class="psec">
+    <h3>&#128205; Report New Incident / Hazard</h3>
+    <p style="font-size:.68rem;color:var(--muted);margin-bottom:6px">After selecting a category, tap a room on the floor plan below to place a pin.</p>
+    <div class="pin-legend" id="pinLegend">
+      <div class="pin-cat sel" id="pc-fire" onclick="selectPinCat('fire')"><span class="dot" style="background:#ef4444"></span>Fire</div>
+      <div class="pin-cat" id="pc-water" onclick="selectPinCat('water')"><span class="dot" style="background:#3b82f6"></span>Water</div>
+      <div class="pin-cat" id="pc-electrical" onclick="selectPinCat('electrical')"><span class="dot" style="background:#facc15"></span>Electrical</div>
+      <div class="pin-cat" id="pc-hazard" onclick="selectPinCat('hazard')"><span class="dot" style="background:#f97306"></span>Hazard</div>
+      <div class="pin-cat" id="pc-injury" onclick="selectPinCat('injury')"><span class="dot" style="background:#ec4899"></span>Injury</div>
+      <div class="pin-cat" id="pc-security" onclick="selectPinCat('security')"><span class="dot" style="background:#a78bfa"></span>Security</div>
+      <div class="pin-cat" id="pc-weather" onclick="selectPinCat('weather')"><span class="dot" style="background:#06b6d4"></span>Weather</div>
+      <div class="pin-cat" id="pc-other" onclick="selectPinCat('other')"><span class="dot" style="background:#6b7280"></span>Other</div>
+    </div>
+    <div class="pin-hint" id="pinHint">Select a category above, then tap a room on the floor plan</div>
+  </div>
+  <div class="psec">
+    <h3>&#128203; Active Incidents</h3>
+    <div id="activeIncidents" class="incident-list"></div>
+  </div>
+  <div class="psec">
+    <h3>&#9989; Resolved Incidents</h3>
+    <div id="resolvedIncidents" class="incident-list"></div>
+  </div>
+  <div class="psec">
+    <h3>&#128200; Summary</h3>
+    <div class="pin-summary-grid" id="pinSummary"></div>
+    <button class="report-btn" onclick="generateIncidentReport()">&#128196; Generate Incident Report</button>
   </div>
 </div>
 
@@ -498,9 +556,20 @@ function renderFloor(cid,rooms,data){
     if(r.fill==="#4c1d95"){
       s+=`<line x1="${x+4}" y1="${y+h}" x2="${x+w-4}" y2="${y+h}" stroke="#facc15" stroke-width="3" opacity="0.7" style="pointer-events:none"/>`;
     }
+    // Draw incident pins on rooms
+    const floorNum=cid==="plan1"?1:2;
+    const roomPins=incidents.filter(i=>i.room===num&&i.floor===floorNum&&!i.resolved);
+    roomPins.forEach((pin,idx)=>{
+      const px=x+w/2+(idx*10)-15,py=y+12;
+      s+=`<circle cx="${px}" cy="${py}" r="6" fill="${pinColors[pin.cat]}" stroke="#0f172a" stroke-width="1.5" style="pointer-events:none"/>`;
+    });
   }
   s+="</svg>";c.innerHTML=s;
-  c.querySelectorAll(".room").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();showRoom(el.getAttribute("r"),cid==="plan1"?1:2);});});
+  c.querySelectorAll(".room").forEach(el=>{el.addEventListener("click",e=>{
+    e.stopPropagation();
+    if(pinDropMode){el.getAttribute("r")&&doPinDrop(el.getAttribute("r"),cid==="plan1"?1:2);}
+    else{showRoom(el.getAttribute("r"),cid==="plan1"?1:2);}
+  });});
 }
 
 function showRoom(num,floor){
@@ -554,7 +623,108 @@ function doASearch(q){const el=document.getElementById("ar");if(!q||q.length<1){
   if(!res.length){el.innerHTML="<p style='color:var(--muted);padding:10px'>No devices match</p>";return;}
   let h=`<p style="color:var(--muted);font-size:.72rem;margin-bottom:5px">${res.length} result(s)</p><table><tr><th>Room</th><th>Device</th><th>Detail</th></tr>`;
   res.forEach(t=>{h+=`<tr><td><b>${t.num}</b><br><span style="color:var(--muted);font-size:.68rem">${t.name}</span></td><td>${t.device}</td><td style="color:var(--muted)">${t.det}</td></tr>`;});h+="</table>";el.innerHTML=h;}
-function showView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));document.getElementById(id).classList.add("active");const t=["floor1","floor2","search","alarms","drills","packet"];const i=t.indexOf(id);if(i>=0)document.querySelectorAll(".tabs button")[i].classList.add("active");}
+function showView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));document.getElementById(id).classList.add("active");const t=["floor1","floor2","search","alarms","drills","incidents","packet"];const i=t.indexOf(id);if(i>=0)document.querySelectorAll(".tabs button")[i].classList.add("active");}
+
+/* ===== INCIDENT / HAZARD PIN MAP ===== */
+const pinColors={fire:"#ef4444",water:"#3b82f6",electrical:"#facc15",hazard:"#f97306",injury:"#ec4899",security:"#a78bfa",weather:"#06b6d4",other:"#6b7280"};
+const pinLabels={fire:"🔥 Fire",water:"💧 Water",electrical:"⚡ Electrical",hazard:"🚫 Hazard",injury:"🏥 Injury",security:"🔒 Security",weather:"🌪️ Weather",other:"❓ Other"};
+let pinDropMode=false, selectedPinCat="fire", incidents=[];
+try{incidents=JSON.parse(localStorage.getItem("mcaIncidents"))||[]}catch(e){incidents=[]}
+
+function selectPinCat(cat){
+  selectedPinCat=cat;pinDropMode=true;
+  ["fire","water","electrical","hazard","injury","security","weather","other"].forEach(c=>{
+    document.getElementById("pc-"+c).classList.toggle("sel",c===cat);
+  });
+  document.getElementById("pinHint").textContent="Now tap a room on the floor plan to place "+pinLabels[cat]+" pin";
+  document.getElementById("pinHint").classList.add("active");
+}
+
+function doPinDrop(room,floor){
+  const data=floor===1?D1:D2;
+  const roomName=(data[room]&&data[room].name)||"Room "+room;
+  const notes=prompt("Notes for "+pinLabels[selectedPinCat]+" in "+room+" ("+roomName+"):\n(optional — tap Cancel for no notes)");
+  if(notes===null)return;
+  const entry={id:Date.now(),room,floor,cat:selectedPinCat,notes:notes.trim(),created:new Date().toLocaleString(),resolved:false};
+  incidents.unshift(entry);
+  localStorage.setItem("mcaIncidents",JSON.stringify(incidents));
+  pinDropMode=false;
+  document.getElementById("pinHint").textContent="Pin placed! Select another category to place more.";
+  document.getElementById("pinHint").classList.remove("active");
+  ["fire","water","electrical","hazard","injury","security","weather","other"].forEach(c=>{
+    document.getElementById("pc-"+c).classList.remove("sel");
+  });
+  renderFloor("plan1",F1,D1);
+  renderFloor("plan2",F2,D2);
+  renderIncidentLists();
+  updatePinSummary();
+}
+
+function resolveIncident(id){
+  const inc=incidents.find(i=>i.id===id);
+  if(inc){inc.resolved=true;inc.resolvedAt=new Date().toLocaleString();localStorage.setItem("mcaIncidents",JSON.stringify(incidents));}
+  renderFloor("plan1",F1,D1);renderFloor("plan2",F2,D2);
+  renderIncidentLists();updatePinSummary();
+}
+
+function deleteIncident(id){
+  incidents=incidents.filter(i=>i.id!==id);
+  localStorage.setItem("mcaIncidents",JSON.stringify(incidents));
+  renderFloor("plan1",F1,D1);renderFloor("plan2",F2,D2);
+  renderIncidentLists();updatePinSummary();
+}
+
+function renderIncidentLists(){
+  const active=incidents.filter(i=>!i.resolved);
+  const resolved=incidents.filter(i=>i.resolved);
+  const aEl=document.getElementById("activeIncidents");
+  const rEl=document.getElementById("resolvedIncidents");
+  if(!active.length){aEl.innerHTML="<p style='color:var(--muted);padding:10px;font-size:.75rem'>No active incidents</p>";}
+  else{let h="";active.forEach(i=>{
+    const data=i.floor===1?D1:D2;const rData=data[i.room];const rName=(rData&&rData.name)||"Room "+i.room;
+    h+=`<div class="inc-item"><span class="inc-dot" style="background:${pinColors[i.cat]}"></span><div class="inc-info"><div class="inc-room">${i.room} — ${rName}</div><div class="inc-meta">${pinLabels[i.cat]} · Fl ${i.floor} · ${i.created}</div>${i.notes?`<div class="inc-notes">${i.notes}</div>`:""}</div><div class="inc-actions"><button class="inc-btn resolve" onclick="resolveIncident(${i.id})" title="Resolve">✓</button><button class="inc-btn del" onclick="deleteIncident(${i.id})" title="Delete">✕</button></div></div>`;
+  });aEl.innerHTML=h;}
+  if(!resolved.length){rEl.innerHTML="<p style='color:var(--muted);padding:10px;font-size:.75rem'>No resolved incidents</p>";}
+  else{let h="";resolved.forEach(i=>{
+    const data=i.floor===1?D1:D2;const rData=data[i.room];const rName=(rData&&rData.name)||"Room "+i.room;
+    h+=`<div class="inc-item" style="opacity:.6"><span class="inc-dot" style="background:${pinColors[i.cat]}"></span><div class="inc-info"><div class="inc-room">${i.room} — ${rName}</div><div class="inc-meta">${pinLabels[i.cat]} · Fl ${i.floor} · ${i.created} → Resolved ${i.resolvedAt||""}</div>${i.notes?`<div class="inc-notes">${i.notes}</div>`:""}</div><div class="inc-actions"><button class="inc-btn del" onclick="deleteIncident(${i.id})" title="Delete">✕</button></div></div>`;
+  });rEl.innerHTML=h;}
+}
+
+function updatePinSummary(){
+  const active=incidents.filter(i=>!i.resolved);
+  const resolved=incidents.filter(i=>i.resolved);
+  const cats={};active.forEach(i=>{cats[i.cat]=(cats[i.cat]||0)+1;});
+  let h=`<div class="pin-stat"><div class="snum" style="color:#ef4444">${active.length}</div><div class="slbl">Active</div></div>`;
+  h+=`<div class="pin-stat"><div class="snum" style="color:#22c55e">${resolved.length}</div><div class="slbl">Resolved</div></div>`;
+  for(const[cat,cnt] of Object.entries(cats)){
+    h+=`<div class="pin-stat"><div class="snum" style="color:${pinColors[cat]}">${cnt}</div><div class="slbl">${pinLabels[cat]}</div></div>`;
+  }
+  document.getElementById("pinSummary").innerHTML=h;
+}
+
+function generateIncidentReport(){
+  const active=incidents.filter(i=>!i.resolved);
+  const resolved=incidents.filter(i=>i.resolved);
+  const now=new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+  let html=`<!DOCTYPE html><html><head><title>MCA Incident Report</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#111}h1{font-size:1.4rem;margin-bottom:2px}h2{font-size:.9rem;color:#555;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:.85rem}th,td{padding:8px 6px;text-align:left;border-bottom:1px solid #ddd}th{background:#f1f5f9;font-weight:700}.active{color:#ef4444;font-weight:700}.resolved{color:#22c55e}</style></head><body>`;
+  html+=`<h1>Mason Classical Academy K-8</h1><h2>Incident Report — Generated ${now}</h2>`;
+  html+=`<p style="font-size:.85rem"><b>Address:</b> 7170 Vanderbilt Beach Rd, Naples, FL 34119<br><b>Prepared by:</b> Safety Office</p>`;
+  html+=`<h3>Active Incidents (${active.length})</h3><table><tr><th>Room</th><th>Floor</th><th>Category</th><th>Reported</th><th>Notes</th></tr>`;
+  if(!active.length)html+=`<tr><td colspan="5" style="color:#888">No active incidents</td></tr>`;
+  active.forEach(i=>{const data=i.floor===1?D1:D2;const rName=(data[i.room]&&data[i.room].name)||"";html+=`<tr><td><b>${i.room}</b> ${rName}</td><td>${i.floor}</td><td>${pinLabels[i.cat]}</td><td>${i.created}</td><td>${i.notes||"—"}</td></tr>`;});
+  html+=`</table>`;
+  html+=`<h3 style="margin-top:20px">Resolved Incidents (${resolved.length})</h3><table><tr><th>Room</th><th>Floor</th><th>Category</th><th>Reported</th><th>Resolved</th></tr>`;
+  if(!resolved.length)html+=`<tr><td colspan="5" style="color:#888">No resolved incidents</td></tr>`;
+  resolved.forEach(i=>{const data=i.floor===1?D1:D2;const rName=(data[i.room]&&data[i.room].name)||"";html+=`<tr><td><b>${i.room}</b> ${rName}</td><td>${i.floor}</td><td>${pinLabels[i.cat]}</td><td>${i.created}</td><td>${i.resolvedAt||"—"}</td></tr>`;});
+  html+=`</table>`;
+  html+=`<p style="font-size:.7rem;color:#888;margin-top:30px">Generated by MCA Safety Dashboard — https://matthewely-lab.github.io/mca-safety-dashboard/</p></body></html>`;
+  const w=window.open("","_blank");w.document.write(html);w.document.close();
+}
+
+// Init incident lists on load
+renderIncidentLists();
+updatePinSummary();
 
 /* ===== DRILL TRACKER ===== */
 let drillInterval=null, drillStartTime=null, selectedDrillType="fire";
