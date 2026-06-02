@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MCA Safety Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--fire:#f97316;--evac:#22c55e;--exit:#facc15;--sec:#a78bfa;--util:#ef4444}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+header{padding:14px 14px 6px;background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid var(--border)}
+header h1{font-size:1.1rem;font-weight:700;color:var(--accent)}
+header p{font-size:.7rem;color:var(--muted);margin-top:2px}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;overflow-x:auto}
+.tabs button{flex:1;min-width:56px;padding:9px 2px;background:none;border:none;color:var(--muted);font-size:.62rem;font-weight:600;cursor:pointer;text-align:center;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+.view{display:none;padding:10px}
+.view.active{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.legend-item{display:flex;align-items:center;gap:3px;font-size:.65rem;color:var(--muted)}
+.legend-dot{width:9px;height:9px;border-radius:50%}
+.plan-wrap{position:relative;background:#1e293b;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px}
+.plan-wrap svg{width:100%;height:auto;display:block;cursor:pointer}
+.room{stroke:#475569;stroke-width:1.5;transition:all .1s}
+.room:hover{stroke:var(--accent);stroke-width:3;filter:brightness(1.4)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;padding:18px}
+.modal h2{font-size:.95rem;margin:4px 0 2px}
+.modal .rnum{color:var(--accent);font-weight:800;font-size:1.35rem}
+.modal h3{font-size:.74rem;margin:12px 0 5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.device-list{list-style:none}
+.device-list li{padding:6px 0;border-bottom:1px solid var(--border);font-size:.8rem;display:flex;gap:7px;align-items:center}
+.device-list li:last-child{border-bottom:none}
+.dev-icon{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;flex-shrink:0}
+.evac-box{background:#052e16;border:1px solid var(--evac);border-radius:7px;padding:9px;margin:6px 0;font-size:.8rem;color:#86efac;line-height:1.5}
+.close-btn{background:var(--border);border:none;color:var(--text);padding:9px;border-radius:7px;cursor:pointer;margin-top:10px;width:100%;font-weight:600}
+.sbox{position:relative;margin-bottom:10px}
+.sbox input{width:100%;padding:10px 14px 10px 38px;background:var(--card);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:.9rem;outline:none}
+.sbox input:focus{border-color:var(--accent)}
+.sbox svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.75rem}
+th,td{padding:7px 5px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.3px}
+tr:active{background:var(--card)}
+.psec{margin-bottom:12px;background:var(--card);border-radius:9px;padding:11px;border:1px solid var(--border)}
+.psec h3{font-size:.78rem;color:var(--accent);margin-bottom:5px}
+.psec p{font-size:.8rem;line-height:1.55}
+.stat{font-size:1.35rem;font-weight:700}
+.slabel{font-size:.7rem;color:var(--muted)}
+.btn-print{position:fixed;bottom:14px;right:14px;width:50px;height:50px;border-radius:50%;background:var(--accent);border:none;color:#0f172a;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 20px rgba(56,189,248,.3);z-index:200}
+@media print{.tabs,.btn-print,.modal-overlay,.legend,.sbox{display:none!important}.view{display:block!important}.psec{break-inside:avoid;border:1px solid #ccc;background:none}header{position:static}}
+</style>
+</head>
+<body>
+
+<header><h1>&#128716; MCA Safety Dashboard</h1><p>Mason Classical Academy K-8 &bull; 7170 Vanderbilt Beach Rd, Naples, FL 34119</p></header>
+
+<div class="tabs">
+  <button class="active" onclick="showView('floor1')">&#128716; 1st</button>
+  <button onclick="showView('floor2')">&#128716; 2nd</button>
+  <button onclick="showView('search')">&#128269; Search</button>
+  <button onclick="showView('alarms')">&#128293; Devices</button>
+  <button onclick="showView('packet')">&#128196; Packet</button>
+</div>
+
+<div id="floor1" class="view active">
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#4c1d95"></span>Stair</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#d97706"></span>Command</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#15803d"></span>Lab</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1a4731"></span>Classroom</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1e3a5f"></span>Admin</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#7f1d1d"></span>Utility</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#ef4444;border-radius:0"></span>Pull Station</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#a78ffa"></span>Camera</span>
+  </div>
+  <div class="plan-wrap" id="plan1"></div>
+</div>
+
+<div id="floor2" class="view">
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#4c1d95"></span>Stair</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#d97706"></span>Command</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#15803d"></span>Science</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1a4731"></span>Classroom</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#1e3a5f"></span>Admin</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#7f1d1d"></span>Utility</span>
+  </div>
+  <div class="plan-wrap" id="plan2"></div>
+</div>
+
+<div id="search" class="view">
+  <div class="sbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="si" placeholder="Search room #, name, device..." oninput="doSearch(this.value)"></div>
+  <div id="sr"></div>
+</div>
+
+<div id="alarms" class="view">
+  <div class="sbox"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="ai" placeholder="Search devices: smoke, strobe, pull, speaker, heat..." oninput="doASearch(this.value)"></div>
+  <div id="ar"></div>
+</div>
+
+<div id="packet" class="view">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div class="psec"><div class="stat">1,500</div><div class="slabel">Students (max)</div></div>
+    <div class="psec"><div class="stat">200</div><div class="slabel">Staff</div></div>
+    <div class="psec"><div class="stat">6</div><div class="slabel">Stairwells (3/floor)</div></div>
+    <div class="psec"><div class="stat">2</div><div class="slabel">Floors</div></div>
+  </div>
+  <div class="psec"><h3>&#128692; Stairwells &mdash; Fire Evacuation</h3>
+    <p><b>Stair North (104/203)</b> &mdash; NW corner, Admin/Clinic wing<br>
+    <b>Stair South (173/258)</b> &mdash; SW corner, Music/Multipurpose wing<br>
+    <b>Stair East (131/212)</b> &mdash; Mid-east side, classroom corridor<br>
+    <b>Elevators (136/277)</b> &mdash; <u>NOT for fire evacuation</u><br>
+    <b>Area of Refuge</b> panels at each stairwell with firefighter phone jack.<br>
+    <b>Stopper II</b> protective covers on ALL pull stations (local alarm).</p></div>
+  <div class="psec"><h3>&#128293; Fire Alarm System (NFPA 72)</h3>
+    <p><b>Type:</b> Addressable voice evacuation<br>
+    <b>Wiring:</b> FPLP (risers FPLR), red jacket cable<br>
+    <b>Power:</b> Dedicated 120V red circuits, emergency power<br>
+    <b>Activation:</b> Pull stations, smoke (ionization/photo), heat (rate+fixed), duct smoke (>2,000 CFM AHU), sprinkler flow/tamper, beam detectors (high ceilings)<br>
+    <b>Response:</b> &lt;3 sec alarm, HVAC shutdown, door holder release, strobes/speakers activate, signals to remote monitoring station</p></div>
+  <div class="psec"><h3>&#128197; Key Contacts &amp; Rooms</h3>
+    <tr><th>Role</th><th>Room</th><th>Notes</th></tr>
+    <tr><td>Principal</td><td>102</td><td>NW Admin wing</td></tr>
+    <tr><td>CEO</td><td>200</td><td>2nd floor NW</td></tr>
+    <tr><td>Asst Principal (Safety)</td><td>119/262</td><td>Incident command</td></tr>
+    <tr><td>Dean K-2</td><td>118</td><td>West admin</td></tr>
+    <tr><td>Dean 3-5</td><td>233</td><td>2nd floor</td></tr>
+    <tr><td>Dean 6-8</td><td>256</td><td>2nd floor</td></tr>
+    <tr><td>Nurse/Clinic</td><td>105/120</td><td>NW wing</td></tr>
+    <tr><td>Sheriff's Deputy</td><td>172</td><td>South wing</td></tr>
+    <tr><td>IT Office</td><td>221</td><td>IDF room, 2nd fl</td></tr>
+    <tr><td>Facilities Mgr</td><td>178</td><td>SW wing</td></tr>
+    <tr><td>Exec Director</td><td>233</td><td>2nd floor SE</td></tr></table></div>
+  <div class="psec"><h3>&#127775; Hazards</h3>
+    <p><b>Science Labs (251-254)</b> &mdash; Chemical storage, emergency eyewash<br>
+    <b>Kitchen/Cafeteria (180)</b> &mdash; Ansul hood suppression, grease fire risk<br>
+    <b>Electrical Rooms (135/177/222/263)</b> &mdash; Authorized only, arc flash<br>
+    <b>MDF/IDF (135A/176/221/264)</b> &mdash; Clean agent, authorized only<br>
+    <b>Multipurpose (180)</b> &mdash; High occupancy, beam detectors, multiple exits</p></div>
+  <div class="psec"><h3>&#128274; Security Systems</h3>
+    <p><b>Access Control:</b> Proximity card readers (CR) at all exterior doors, lockdown button on emergency generator<br>
+    <b>Cameras (PS):</b> Interior/exterior IP cameras to nearest IDF<br>
+    <b>Intrusion Detection:</b> 360° ceiling motion, wall motion at 12', glass break detectors<br>
+    <b>BDA:</b> Bi-directional amplifier for first responder radio<br>
+    <b>Door Contacts:</b> All roof hatches, exterior doors</p></div>
+  <div class="psec"><h3>&#128205; Address</h3>
+    <p style="font-size:1.05rem;font-weight:700">7170 Vanderbilt Beach Rd<br>Naples, FL 34119</p>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:4px">Naples Sheriff Office &bull; FD Station #18</p></div>
+</div>
+
+<div id="roomModal" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="rnum" id="mRN"></div>
+    <h2 id="mName"></h2>
+    <h3>&#128293; Fire Safety Devices</h3>
+    <ul class="device-list" id="mDev"></ul>
+    <h3>&#128692; Nearest Evacuation Route</h3>
+    <div class="evac-box" id="mEvac"></div>
+    <h3>&#128274; Security Devices</h3>
+    <ul class="device-list" id="mSec"></ul>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<button class="btn-print" onclick="window.print()" title="Print / Save PDF">&#128424;</button>
+
+<script>
+const F1={
+  100:{xy:[20,20,100,70],fill:"#1e3a5f"},
+  101:{xy:[20,90,100,50],fill:"#1e3a5f"},
+  102:{xy:[20,140,100,60],fill:"#1e3a5f"},
+  104:{xy:[20,200,70,60],fill:"#4c1d95"},
+  105:{xy:[90,200,70,60],fill:"#1e3a5f"},
+  106:{xy:[160,200,80,60],fill:"#1e3a5f"},
+  107:{xy:[120,20,80,70],fill:"#1e3a5f"},
+  108:{xy:[120,90,80,50],fill:"#1e3a5f"},
+  109:{xy:[200,200,80,60],fill:"#1e3a5f"},
+  112:{xy:[20,340,80,70],fill:"#1a4731"},
+  113:{xy:[20,410,80,70],fill:"#1a4731"},
+  115:{xy:[20,480,80,70],fill:"#1e3a5f"},
+  116:{xy:[20,550,55,60],fill:"#1e3a5f"},
+  117:{xy:[75,550,60,60],fill:"#1e3a5f"},
+  118:{xy:[140,550,80,60],fill:"#1e3a5f"},
+  119:{xy:[100,480,100,70],fill:"#d97706"},
+  120:{xy:[140,340,100,70],fill:"#1a4731"},
+  123:{xy:[280,340,90,70],fill:"#1a4731"},
+  124:{xy:[370,340,90,70],fill:"#1a4731"},
+  125:{xy:[460,340,90,70],fill:"#1a4731"},
+  126:{xy:[550,340,90,70],fill:"#1a4731"},
+  127:{xy:[640,340,90,70],fill:"#1a4731"},
+  128:{xy:[730,340,90,70],fill:"#1a4731"},
+  129:{xy:[280,270,90,70],fill:"#1a4731"},
+  130:{xy:[370,270,90,70],fill:"#1a4731"},
+  131:{xy:[400,200,70,60],fill:"#4c1d95"},
+  132:{xy:[460,270,90,70],fill:"#1a4731"},
+  133:{xy:[550,270,90,70],fill:"#1a4731"},
+  134:{xy:[640,270,90,70],fill:"#1a4731"},
+  135:{xy:[470,200,60,60],fill:"#7f1d1d"},
+  "135A":{xy:[530,200,60,60],fill:"#7f1d1d"},
+  136:{xy:[590,200,70,60],fill:"#374151"},
+  147:{xy:[730,410,90,70],fill:"#1a4731"},
+  149:{xy:[730,480,90,70],fill:"#1a4731"},
+  151:{xy:[730,550,90,65],fill:"#1a4731"},
+  153:{xy:[730,615,90,65],fill:"#1a4731"},
+  155:{xy:[640,615,90,65],fill:"#1a4731"},
+  157:{xy:[550,615,90,65],fill:"#1a4731"},
+  160:{xy:[20,660,90,65],fill:"#1a4731"},
+  162:{xy:[110,660,90,65],fill:"#1a4731"},
+  164:{xy:[200,660,90,65],fill:"#1a4731"},
+  166:{xy:[290,660,90,65],fill:"#1a4731"},
+  167:{xy:[380,660,90,65],fill:"#1a4731"},
+  168:{xy:[20,725,55,45],fill:"#374151"},
+  169:{xy:[75,725,55,45],fill:"#374151"},
+  170:{xy:[470,660,90,65],fill:"#1a4731"},
+  172:{xy:[290,730,100,50],fill:"#d97706"},
+  173:{xy:[290,200,70,60],fill:"#4c1d95"},
+  174:{xy:[560,660,90,65],fill:"#1a4731"},
+  175:{xy:[650,660,80,65],fill:"#374151"},
+  "175A":{xy:[730,660,60,32],fill:"#7f1d1d"},
+  176:{xy:[730,692,60,32],fill:"#7f1d1d"},
+  177:{xy:[360,200,40,60],fill:"#7f1d1d"},
+  178:{xy:[140,660,60,65],fill:"#374151"},
+  180:{xy:[290,410,200,250],fill:"#1a4731"},
+  182:{xy:[490,410,80,100],fill:"#374151"},
+};
+const F2={
+  200:{xy:[20,20,100,70],fill:"#1e3a5f"},
+  201:{xy:[120,20,80,70],fill:"#1a4731"},
+  202:{xy:[200,20,80,70],fill:"#374151"},
+  203:{xy:[20,90,70,60],fill:"#4c1d95"},
+  204:{xy:[20,200,80,70],fill:"#1a4731"},
+  205:{xy:[20,270,80,70],fill:"#1a4731"},
+  206:{xy:[20,340,80,70],fill:"#1a4731"},
+  207:{xy:[20,410,80,70],fill:"#1a4731"},
+  208:{xy:[20,480,80,70],fill:"#1a4731"},
+  209:{xy:[20,550,80,70],fill:"#1a4731"},
+  210:{xy:[20,620,80,70],fill:"#1a4731"},
+  211:{xy:[20,690,80,70],fill:"#1a4731"},
+  212:{xy:[100,200,70,60],fill:"#4c1d95"},
+  213:{xy:[100,260,90,70],fill:"#1a4731"},
+  214:{xy:[190,260,90,70],fill:"#1a4731"},
+  216:{xy:[280,260,70,70],fill:"#374151"},
+  218:{xy:[350,260,70,70],fill:"#1e3a5f"},
+  219:{xy:[420,260,100,70],fill:"#d97706"},
+  221:{xy:[170,200,60,60],fill:"#7f1d1d"},
+  222:{xy:[230,200,60,60],fill:"#7f1d1d"},
+  223:{xy:[100,330,90,70],fill:"#1a4731"},
+  224:{xy:[190,330,90,70],fill:"#1a4731"},
+  225:{xy:[100,400,90,70],fill:"#1a4731"},
+  226:{xy:[190,400,90,70],fill:"#1a4731"},
+  227:{xy:[280,330,90,70],fill:"#1a4731"},
+  228:{xy:[370,330,90,70],fill:"#1a4731"},
+  229:{xy:[460,330,50,70],fill:"#374151"},
+  230:{xy:[510,330,50,70],fill:"#374151"},
+  231:{xy:[560,260,70,70],fill:"#374151"},
+  232:{xy:[730,340,90,70],fill:"#1a4731"},
+  233:{xy:[560,330,60,70],fill:"#1e3a5f"},
+  234:{xy:[620,330,50,70],fill:"#374151"},
+  235:{xy:[280,400,90,70],fill:"#1a4731"},
+  236:{xy:[370,400,90,70],fill:"#1a4731"},
+  237:{xy:[460,400,90,70],fill:"#1a4731"},
+  238:{xy:[550,400,90,70],fill:"#1a4731"},
+  239:{xy:[640,400,90,70],fill:"#1a4731"},
+  240:{xy:[730,400,90,70],fill:"#1a4731"},
+  241:{xy:[280,470,90,70],fill:"#1a4731"},
+  242:{xy:[370,470,90,70],fill:"#1a4731"},
+  243:{xy:[460,470,90,70],fill:"#1a4731"},
+  244:{xy:[550,470,90,70],fill:"#1a4731"},
+  245:{xy:[640,470,90,70],fill:"#1a4731"},
+  246:{xy:[730,470,90,70],fill:"#1a4731"},
+  247:{xy:[280,540,90,70],fill:"#1a4731"},
+  248:{xy:[370,540,90,70],fill:"#1a4731"},
+  249:{xy:[460,540,90,70],fill:"#1a4731"},
+  250:{xy:[550,540,90,70],fill:"#1a4731"},
+  251:{xy:[550,610,90,70],fill:"#15803d"},
+  252:{xy:[640,610,90,70],fill:"#15803d"},
+  253:{xy:[730,610,90,70],fill:"#15803d"},
+  254:{xy:[550,680,90,70],fill:"#15803d"},
+  255:{xy:[640,680,90,70],fill:"#1a4731"},
+  256:{xy:[100,470,70,70],fill:"#1e3a5f"},
+  257:{xy:[730,750,90,70],fill:"#1a4731"},
+  258:{xy:[100,540,70,60],fill:"#4c1d95"},
+  277:{xy:[420,200,70,60],fill:"#374151"},
+};
+const D1={
+  100:{name:"General Reception",fire:[{t:"Speaker/Strobe",d:"Combo device"},{t:"Smoke Detector",d:"Ionization"},{t:"Pull Station",d:"Near exit, Stopper II"}],sec:[{t:"Camera",d:"Interior"},{t:"Intercom Handset",d:"Admin Control (ACS)"}],ev:"Main entrance → South parking lot assembly area"},
+  101:{name:"Front Desk",fire:[{t:"Speaker",d:"Ceiling"},{t:"Smoke Detector",d:""}],sec:[{t:"Card Reader",d:"Access control"}],ev:"→ Main entrance → Parking lot"},
+  102:{name:"Principal",fire:[{t:"Speaker",d:""},{t:"Strobe",d:"Wall mount"}],sec:[{t:"Camera",d:""},{t:"Intercom",d:"Admin Control Handset (ACS)"}],ev:"→ Stair North (104) → Ground → South lot"},
+  104:{name:"Stair North",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator panel"}],sec:[{t:"Door Contact",d:"Monitor"}],ev:"FIRE EXIT: Descend to ground → Exit south"},
+  105:{name:"Clinic",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"Intercom",d:"Rescue Area Ctrl (RCS)"}],ev:"→ Stair North (104) — MEDICAL TRIAGE"},
+  118:{name:"Dean (K-2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""}],sec:[],ev:"→ Stair North (104)"},
+  119:{name:"Asst Principal / Safety",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Stair North (104) — 1ST FL INCIDENT COMMAND"},
+  120:{name:"Clinic / Nurse",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"Intercom",d:"RCS"}],ev:"→ Stair North (104) — MEDICAL TRIAGE"},
+  123:{name:"Classroom (Gr 1-3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131) or Stair North (104)"},
+  131:{name:"Stair East",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"},{t:"Fire Phone Jack",d:"Warden phone"}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South exit"},
+  135:{name:"Electrical Room",fire:[{t:"Heat Detector",d:"Fixed temp"},{t:"Smoke Detector",d:"Photo"}],sec:[{t:"Card Reader",d:"Restricted"}],ev:"→ Stair East (131) — AUTHORIZED ONLY"},
+  "135A":{name:"MDF",fire:[{t:"Smoke Detector",d:""},{t:"Heat Detector",d:"Fixed"}],sec:[{t:"Card Reader",d:"Restricted"}],ev:"→ Electrical → Stair East — AUTHORIZED ONLY"},
+  136:{name:"Elevator",fire:[{t:"Duct Smoke Detector",d:"Photo, in shaft"},{t:"Firefighter Phone",d:"Hardwired"}],sec:[],ev:"DO NOT USE IN FIRE → Stair East (131)"},
+  172:{name:"Sheriff's Deputy",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""}],sec:[{t:"Cameras",d:"Interior monitoring"},{t:"Motion Detector",d:"360° ceiling"}],ev:"→ Stair South (173) — LAW ENFORCEMENT COMMAND"},
+  173:{name:"Stair South",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South exit"},
+  178:{name:"Facilities Manager",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""}],sec:[],ev:"→ Stair South (173) — BUILDING SYSTEMS"},
+  180:{name:"Multipurpose / Cafeteria",fire:[{t:"Speaker",d:"Distributed ceiling"},{t:"Strobe Ceiling",d:"High ceiling mount"},{t:"Beam Detector",d:"Transmitter/Receiver pairs"},{t:"Pull Station",d:"At each exit, Stopper II"}],sec:[{t:"Cameras",d:"Interior"},{t:"Motion",d:"360° ceiling"},{t:"PA Speaker",d:"Paging"}],ev:"PRIMARY: South exit doors → Lot | BACKUP: Stair South (173) — HIGH OCCUPANCY"},
+  160:{name:"Music Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Corridor → Stair South (173)"},
+  147:{name:"Kindergarten",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Display"}],ev:"→ Stair East (131)"},
+  112:{name:"ESE (K-2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+};
+const D2={
+  200:{name:"CEO Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (203)"},
+  203:{name:"Stair North",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South lot"},
+  212:{name:"Stair East",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"},{t:"Fire Phone Jack",d:""}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South exit"},
+  219:{name:"AP / Safety (2nd)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212) — 2ND FL INCIDENT COMMAND"},
+  221:{name:"IDF / IT Office",fire:[{t:"Smoke Detector",d:""}],sec:[{t:"Card Reader",d:"Restricted"}],ev:"→ Stair East (212) — AUTHORIZED ONLY"},
+  222:{name:"Electrical Room",fire:[{t:"Heat Detector",d:"Fixed"},{t:"Smoke Detector",d:""}],sec:[{t:"Card Reader",d:"Restricted"}],ev:"→ Stair East (212) — AUTHORIZED ONLY"},
+  251:{name:"Science Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:"Photo"},{t:"Heat Detector",d:"Rate-of-rise"},{t:"Pull Station",d:"Near exit"}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (258) — CHEMICAL HAZARD"},
+  252:{name:"Science Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""},{t:"Heat Detector",d:"Rate-of-rise"}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (258) — CHEMICAL HAZARD"},
+  256:{name:"Dean (6-8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (258)"},
+  258:{name:"Stair South",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South exit"},
+  277:{name:"Elevator",fire:[{t:"Duct Smoke Detector",d:"Photo"},{t:"Firefighter Phone",d:"Hardwired"}],sec:[],ev:"DO NOT USE IN FIRE → Stair East (212)"},
+};
+
+function renderFloor(cid,rooms,data){
+  const c=document.getElementById(cid);if(!c)return;
+  let mx=0,my=0;
+  for(const r of Object.values(rooms)){mx=Math.max(mx,r.xy[0]+r.xy[2]);my=Math.max(my,r.xy[1]+r.xy[3]);}
+  const p=20,W=mx+p*2,H=my+p*2;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#0f172a"/>`;
+  for(const[num,r] of Object.entries(rooms)){
+    const[x,y,w,h]=r.xy;
+    const d=data[num],nm=d?d.name:"";
+    s+=`<rect class="room" x="${x}" y="${y}" width="${w}" height="${h}" fill="${r.fill}" rx="3" data-r="${num}"/>`;
+    const fs=w<55?13:17;
+    s+=`<text x="${x+w/2}" y="${y+h/2-4}" text-anchor="middle" fill="white" font-size="${fs}" font-weight="700" font-family="sans-serif" style="pointer-events:none">${num}</text>`;
+    if(w>=65&&nm){const nfs=w<85?8:9;const mc=Math.floor(w/5.2);const tr=nm.length>mc?nm.substring(0,mc)+"…":nm;
+    s+=`<text x="${x+w/2}" y="${y+h/2+10}" text-anchor="middle" fill="#94a3b8" font-size="${nfs}" font-family="sans-serif" style="pointer-events:none">${tr}</text>`;}
+    if(r.fill==="#4c1d95")s+=`<text x="${x+w/2}" y="${y+h/2+22}" text-anchor="middle" fill="#c4b5fd" font-size="8" font-weight="600" font-family="sans-serif" style="pointer-events:none">STAIR</text>`;
+    if(d&&d.fire.some(f=>f.t.includes("Pull")))s+=`<circle cx="${x+7}" cy="${y+7}" r="4" fill="#ef4444" opacity="0.9" style="pointer-events:none"/>`;
+    if(d&&d.sec.some(s2=>s2.t.includes("Cam")))s+=`<text x="${x+w-14}" y="${y+14}" fill="#a78bfa" font-size="12" style="pointer-events:none">&#128247;</text>`;
+    if(r.fill==="#4c1d95"){
+      s+=`<line x1="${x+4}" y1="${y+h}" x2="${x+w-4}" y2="${y+h}" stroke="#facc15" stroke-width="3" opacity="0.7" style="pointer-events:none"/>`;
+    }
+  }
+  s+="</svg>";c.innerHTML=s;
+  c.querySelectorAll(".room").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();showRoom(el.getAttribute("r"),cid==="plan1"?1:2);});});
+}
+
+function showRoom(num,floor){
+  const data=floor===1?D1:D2;const room=data[num];if(!room)return;
+  document.getElementById("mRN").textContent=num;
+  document.getElementById("mName").textContent=room.name;
+  const dev=document.getElementById("mDev");dev.innerHTML="";
+  if(room.fire.length){room.fire.forEach(d=>{
+    const c=d.t.includes("Smoke")||d.t.includes("Heat")||d.t.includes("Duct")?"#f97316":d.t.includes("Pull")?"#ef4444":d.t.includes("Strobe")||d.t.includes("Speaker")?"#38bdf8":"#22c55e";
+    dev.innerHTML+=`<li><span class="dev-icon" style="background:${c}22;color:${c}">${d.t.substring(0,4)}</span><div><b>${d.t}</b><br><span style="color:var(--muted);font-size:.72rem">${d.d}</span></div></li>`;
+  });}else dev.innerHTML="<li style='color:var(--muted)'>No dedicated fire devices</li>";
+  document.getElementById("mEvac").textContent=room.ev;
+  const sec=document.getElementById("mSec");sec.innerHTML="";
+  if(room.sec.length){room.sec.forEach(s=>{
+    sec.innerHTML+=`<li><span class="dev-icon" style="background:#a78bfa22;color:#a78bfa">${s.t.substring(0,4)}</span><div><b>${s.t}</b><br><span style="color:var(--muted);font-size:.72rem">${s.d}</span></div></li>`;
+  });}else sec.innerHTML="<li style='color:var(--muted)'>No dedicated security devices</li>";
+  document.getElementById("roomModal").classList.add("show");
+}
+function closeModal(e){if(!e||e.target===document.getElementById("roomModal")||e.target.classList.contains("close-btn"))document.getElementById("roomModal").classList.remove("show");}
+
+function doSearch(q){const el=document.getElementById("sr");if(!q||q.length<1){el.innerHTML="";return;}q=q.toLowerCase();const res=[];
+  for(const[num,d]of Object.entries(D1)){if(num.includes(q)||d.name.toLowerCase().includes(q)||d.ev.toLowerCase().includes(q)||d.fire.some(f=>f.t.toLowerCase().includes(q))||d.sec.some(s=>s.t.toLowerCase().includes(q)))res.push({num,floor:1,d});}
+  for(const[num,d]of Object.entries(D2)){if(num.includes(q)||d.name.toLowerCase().includes(q)||d.ev.toLowerCase().includes(q)||d.fire.some(f=>f.t.toLowerCase().includes(q))||d.sec.some(s=>s.t.toLowerCase().includes(q)))res.push({num,floor:2,d});}
+  if(!res.length){el.innerHTML="<p style='color:var(--muted);padding:10px'>No matches found</p>";return;}
+  let h="<table><tr><th>Room</th><th>Floor</th><th>Name</th><th>Devices</th></tr>";
+  res.forEach(r=>{const devs=r.d.fire.map(f=>f.t.split("/")[0]).join(", ");h+=`<tr style="cursor:pointer" onclick="showRoom('${r.num}',${r.floor})"><td><b>${r.num}</b></td><td>${r.floor}</td><td>${r.d.name}</td><td>${devs}</td></tr>`;});
+  h+="</table>";el.innerHTML=h;
+}
+
+function doASearch(q){const el=document.getElementById("ar");if(!q||q.length<1){el.innerHTML="";return;}q=q.toLowerCase();const res=[];
+  for(const num of Object.keys(D1)){const d=D1[num];for(const f of d.fire)if(f.t.toLowerCase().includes(q))res.push({num,name:d.name,device:f.t,det:f.d});}
+  for(const num of Object.keys(D2)){const d=D2[num];for(const f of d.fire)if(f.t.toLowerCase().includes(q))res.push({num,name:d.name,device:f.t,det:f.d});}
+  if(!res.length){el.innerHTML="<p style='color:var(--muted);padding:10px'>No devices match</p>";return;}
+  let h=`<p style="color:var(--muted);font-size:.72rem;margin-bottom:5px">${res.length} result(s)</p><table><tr><th>Room</th><th>Device</th><th>Detail</th></tr>`;
+  res.forEach(t=>{h+=`<tr><td><b>${t.num}</b><br><span style="color:var(--muted);font-size:.68rem">${t.name}</span></td><td>${t.device}</td><td style="color:var(--muted)">${t.det}</td></tr>`;});h+="</table>";el.innerHTML=h;}
+function showView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));document.getElementById(id).classList.add("active");const t=["floor1","floor2","search","alarms","packet"];const i=t.indexOf(id);if(i>=0)document.querySelectorAll(".tabs button")[i].classList.add("active");}
+
+renderFloor("plan1",F1,D1);
+renderFloor("plan2",F2,D2);
+</script>
+</body>
+</html>
