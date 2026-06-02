@@ -21,7 +21,7 @@ header p{font-size:.7rem;color:var(--muted);margin-top:2px}
 .legend-dot{width:9px;height:9px;border-radius:50%}
 .plan-wrap{position:relative;background:#1e293b;border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:10px}
 .plan-wrap svg{width:100%;height:auto;display:block;cursor:pointer}
-.room{stroke:#475569;stroke-width:1.5;transition:all .1s}
+.room{stroke:#475569;stroke-width:1.5;transition:all .1s;cursor:pointer}
 .room:hover{stroke:var(--accent);stroke-width:3;filter:brightness(1.4)}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .modal-overlay.show{display:flex}
@@ -305,6 +305,42 @@ const D1={
   160:{name:"Music Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Corridor → Stair South (173)"},
   147:{name:"Kindergarten",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Display"}],ev:"→ Stair East (131)"},
   112:{name:"ESE (K-2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  106:{name:"Enrollment",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  107:{name:"Admin Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  108:{name:"Conference Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  109:{name:"Admin Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  113:{name:"Classroom (K)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (104)"},
+  115:{name:"Events Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  116:{name:"Admin Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  117:{name:"Admin Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (104)"},
+  124:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  125:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  126:{name:"Classroom (Gr 2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  127:{name:"Classroom (Gr 2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  128:{name:"Classroom (Gr 2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  129:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  130:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  132:{name:"Classroom (Gr 2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  133:{name:"Classroom (Gr 2)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  134:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (131)"},
+  149:{name:"Classroom (K)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  151:{name:"Classroom (K)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  153:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  155:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  157:{name:"Classroom (Gr 1)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  162:{name:"Music Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (173)"},
+  164:{name:"Music Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (173)"},
+  166:{name:"Music Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (173)"},
+  167:{name:"Music Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (173)"},
+  168:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair South (173)"},
+  169:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair South (173)"},
+  170:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  174:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (173)"},
+  175:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair South (173)"},
+  "175A":{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair South (173)"},
+  176:{name:"IDF Room",fire:[{t:"Smoke Detector",d:"Photo"},{t:"Heat Detector",d:"Fixed temp"}],sec:[{t:"Card Reader",d:"Restricted access"}],ev:"→ Stair South (173) — AUTHORIZED PERSONNEL ONLY"},
+  177:{name:"Electrical Room",fire:[{t:"Smoke Detector",d:"Photo"},{t:"Heat Detector",d:"Fixed temp"}],sec:[{t:"Card Reader",d:"Restricted access"}],ev:"→ Stair South (173) — AUTHORIZED PERSONNEL ONLY"},
+  182:{name:"Kitchen",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:"Photo"},{t:"Heat Detector",d:"Rate-of-rise"},{t:"Pull Station",d:"Near exit, Stopper II"}],sec:[{t:"Camera",d:"Interior"}],ev:"→ Stair South (173) — ANSUL HOOD SUPPRESSION"},
 };
 const D2={
   200:{name:"CEO Office",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (203)"},
@@ -318,6 +354,52 @@ const D2={
   256:{name:"Dean (6-8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair South (258)"},
   258:{name:"Stair South",fire:[{t:"Speaker",d:""},{t:"Area of Refuge",d:"Annunciator"}],sec:[{t:"Door Contact",d:""}],ev:"FIRE EXIT: Descend to ground → South exit"},
   277:{name:"Elevator",fire:[{t:"Duct Smoke Detector",d:"Photo"},{t:"Firefighter Phone",d:"Hardwired"}],sec:[],ev:"DO NOT USE IN FIRE → Stair East (212)"},
+  201:{name:"Art Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:"Photo"}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (203)"},
+  202:{name:"Workroom",fire:[{t:"Speaker",d:""},{t:"Smoke Detector",d:""}],sec:[],ev:"→ Stair North (203)"},
+  204:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  205:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  206:{name:"Classroom (Gr 3)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  207:{name:"Classroom (Gr 4)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  208:{name:"Classroom (Gr 4)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  209:{name:"Classroom (Gr 4)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  210:{name:"ESE Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair North (203)"},
+  211:{name:"Classroom (Gr 4)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair North (203)"},
+  213:{name:"Classroom (Gr 5)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  214:{name:"Classroom (Gr 5)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  216:{name:"Workroom",fire:[{t:"Speaker",d:""},{t:"Smoke Detector",d:""}],sec:[],ev:"→ Stair East (212)"},
+  218:{name:"Counselor",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212)"},
+  223:{name:"Classroom (Gr 5)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  224:{name:"Art Room",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:"Photo"}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212)"},
+  225:{name:"Classroom (Gr 5)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  226:{name:"Classroom (Gr 6)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  227:{name:"Production Room",fire:[{t:"Speaker",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212)"},
+  228:{name:"Classroom (Gr 6)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  229:{name:"Testing Coordinator",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212)"},
+  230:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair East (212)"},
+  231:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair East (212)"},
+  232:{name:"Classroom (Gr 6)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  233:{name:"Exec Director",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"}],ev:"→ Stair East (212)"},
+  234:{name:"Storage",fire:[{t:"Smoke Detector",d:""},{t:"Speaker",d:""}],sec:[],ev:"→ Stair East (212)"},
+  235:{name:"Classroom (Gr 6)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  236:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  237:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  238:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  239:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  240:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair East (212)"},
+  241:{name:"Classroom (Gr 7)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  242:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  243:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  244:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  245:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  246:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  247:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  248:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  249:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  250:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  253:{name:"Science Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  254:{name:"Science Lab",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  255:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
+  257:{name:"Classroom (Gr 8)",fire:[{t:"Speaker",d:""},{t:"Strobe",d:""},{t:"Smoke Detector",d:""}],sec:[{t:"AP",d:"WiFi"},{t:"LCD",d:"Wall display"}],ev:"→ Corridor → Stair South (258)"},
 };
 
 function renderFloor(cid,rooms,data){
@@ -346,19 +428,37 @@ function renderFloor(cid,rooms,data){
 }
 
 function showRoom(num,floor){
-  const data=floor===1?D1:D2;const room=data[num];if(!room)return;
+  const data=floor===1?D1:D2;const room=data[num];
   document.getElementById("mRN").textContent=num;
-  document.getElementById("mName").textContent=room.name;
-  const dev=document.getElementById("mDev");dev.innerHTML="";
-  if(room.fire.length){room.fire.forEach(d=>{
-    const c=d.t.includes("Smoke")||d.t.includes("Heat")||d.t.includes("Duct")?"#f97316":d.t.includes("Pull")?"#ef4444":d.t.includes("Strobe")||d.t.includes("Speaker")?"#38bdf8":"#22c55e";
-    dev.innerHTML+=`<li><span class="dev-icon" style="background:${c}22;color:${c}">${d.t.substring(0,4)}</span><div><b>${d.t}</b><br><span style="color:var(--muted);font-size:.72rem">${d.d}</span></div></li>`;
-  });}else dev.innerHTML="<li style='color:var(--muted)'>No dedicated fire devices</li>";
-  document.getElementById("mEvac").textContent=room.ev;
-  const sec=document.getElementById("mSec");sec.innerHTML="";
-  if(room.sec.length){room.sec.forEach(s=>{
-    sec.innerHTML+=`<li><span class="dev-icon" style="background:#a78bfa22;color:#a78bfa">${s.t.substring(0,4)}</span><div><b>${s.t}</b><br><span style="color:var(--muted);font-size:.72rem">${s.d}</span></div></li>`;
-  });}else sec.innerHTML="<li style='color:var(--muted)'>No dedicated security devices</li>";
+  if(room){
+    document.getElementById("mName").textContent=room.name;
+    const dev=document.getElementById("mDev");dev.innerHTML="";
+    if(room.fire.length){room.fire.forEach(d=>{
+      const c=d.t.includes("Smoke")||d.t.includes("Heat")||d.t.includes("Duct")?"#f97316":d.t.includes("Pull")?"#ef4444":d.t.includes("Strobe")||d.t.includes("Speaker")?"#38bdf8":"#22c55e";
+      dev.innerHTML+=`<li><span class="dev-icon" style="background:${c}22;color:${c}">${d.t.substring(0,4)}</span><div><b>${d.t}</b><br><span style="color:var(--muted);font-size:.72rem">${d.d}</span></div></li>`;
+    });}else dev.innerHTML="<li style='color:var(--muted)'>No dedicated fire devices</li>";
+    document.getElementById("mEvac").textContent=room.ev;
+    const sec=document.getElementById("mSec");sec.innerHTML="";
+    if(room.sec.length){room.sec.forEach(s=>{
+      sec.innerHTML+=`<li><span class="dev-icon" style="background:#a78bfa22;color:#a78bfa">${s.t.substring(0,4)}</span><div><b>${s.t}</b><br><span style="color:var(--muted);font-size:.72rem">${s.d}</span></div></li>`;
+    });}else sec.innerHTML="<li style='color:var(--muted)'>No dedicated security devices</li>";
+  } else {
+    // No data for this room — show generic info
+    const roomFill=floor===1?F1[num]:F2[num];
+    const fillColor=roomFill?roomFill.fill:"#374151";
+    let genericName="Room "+num;
+    if(fillColor==="#4c1d95")genericName="Stairwell "+num;
+    else if(fillColor==="#d97706")genericName="Admin/Command Room "+num;
+    else if(fillColor==="#15803d")genericName="Science Lab "+num;
+    else if(fillColor==="#1a4731")genericName="Room "+num;
+    else if(fillColor==="#1e3a5f")genericName="Office "+num;
+    else if(fillColor==="#7f1d1d")genericName="Utility/Electrical "+num;
+    else if(fillColor==="#374151")genericName="Room "+num;
+    document.getElementById("mName").textContent=genericName;
+    document.getElementById("mDev").innerHTML="<li style='color:var(--muted)'>Device data not yet mapped — contact Safety Office</li>";
+    document.getElementById("mEvac").textContent="Locate nearest stairwell exit when alarm sounds. Follow posted evacuation maps.";
+    document.getElementById("mSec").innerHTML="<li style='color:var(--muted)'>Security device data not yet mapped</li>";
+  }
   document.getElementById("roomModal").classList.add("show");
 }
 function closeModal(e){if(!e||e.target===document.getElementById("roomModal")||e.target.classList.contains("close-btn"))document.getElementById("roomModal").classList.remove("show");}
